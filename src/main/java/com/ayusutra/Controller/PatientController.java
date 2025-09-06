@@ -1,7 +1,8 @@
 package com.ayusutra.Controller;
 
 
-import com.ayusutra.DTO.PatientResponseDTO;
+import com.ayusutra.DTO.Request.LoginRequestDTO;
+import com.ayusutra.DTO.Response.PatientResponseDTO;
 import com.ayusutra.Entity.MedicalRecord;
 import com.ayusutra.Entity.Patient;
 import com.ayusutra.Service.MedicalRecordService;
@@ -84,6 +85,19 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.CREATED).body(patientDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ " + e.getMessage());
+        }
+    }
+
+
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
+        try {
+            Patient patient = patientService.login(request.getEmail(), request.getPassword());
+            PatientResponseDTO patientResponseDTO = patientService.patientToDto(patient);
+            return ResponseEntity.ok(patientResponseDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).body(e.getMessage());
         }
     }
 }

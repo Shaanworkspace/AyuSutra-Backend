@@ -1,4 +1,4 @@
-package com.ayusutra.DTO;
+package com.ayusutra.DTO.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MedicalRecordResponse {
+public class MedicalRecordResponseDTO {
 
     private Long id;
     private LocalDateTime visitDate;

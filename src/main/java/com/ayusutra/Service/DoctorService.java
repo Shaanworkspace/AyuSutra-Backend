@@ -1,13 +1,14 @@
 package com.ayusutra.Service;
 
 
-import com.ayusutra.DTO.DoctorResponseDTO;
-import com.ayusutra.DTO.MedicalRecordResponse;
+import com.ayusutra.DTO.Response.DoctorResponseDTO;
+import com.ayusutra.DTO.Response.MedicalRecordResponseDTO;
 import com.ayusutra.Entity.Doctor;
 import com.ayusutra.Entity.MedicalRecord;
 import com.ayusutra.Repository.DoctorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +30,10 @@ public class DoctorService {
         return doctorRepository.save(doctor);
     }
 
-    // Get doctor by ID
-    public Doctor getDoctorById(Long id) {
-        return doctorRepository.findById(id).orElse(null);
+    public DoctorResponseDTO getDoctorById(Long id) {
+        return doctorRepository.findById(id)
+                .map(this::mapDoctorToDto)
+                .orElse(null);
     }
 
     // Get doctors by specialization
@@ -48,10 +50,10 @@ public class DoctorService {
                 .collect(Collectors.toList());
     }
     // Convert Doctor entity -> DoctorResponseDTO
-    private DoctorResponseDTO mapDoctorToDto(Doctor doctor) {
+    public DoctorResponseDTO mapDoctorToDto(Doctor doctor) {
 
         // Agar doctor ke medicalRecords hain to unhe DTO me convert karo
-        List<MedicalRecordResponse> recordResponses = doctor.getMedicalRecords() != null
+        List<MedicalRecordResponseDTO> recordResponses = doctor.getMedicalRecords() != null
                 ? doctor.getMedicalRecords().stream()
                 .map(this::mapRecordToDto)  // convert every MedicalRecord to DTO
                 .collect(Collectors.toList())
@@ -71,9 +73,20 @@ public class DoctorService {
         );
     }
     // Convert MedicalRecord entity -> MedicalRecordResponse DTO
-    private MedicalRecordResponse mapRecordToDto(MedicalRecord record) {
+    private MedicalRecordResponseDTO mapRecordToDto(MedicalRecord record) {
         return medicalRecordService.medicalRecordToDto(record);
     }
+
+    public Doctor login(String email, String password) {
+        Doctor doctor = doctorRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("❌ Doctor not found with email: " + email));
+
+        if (!doctor.getPassword().equals(password)) {
+            throw new IllegalArgumentException("❌ Invalid password");
+        }
+        return doctor;
+    }
+
     public Doctor createDoctor(Doctor doctor) {
         return doctorRepository.save(doctor);
     }

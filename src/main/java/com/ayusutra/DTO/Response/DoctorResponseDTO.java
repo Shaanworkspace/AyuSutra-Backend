@@ -1,4 +1,4 @@
-package com.ayusutra.DTO;
+package com.ayusutra.DTO.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,5 +20,5 @@ public class DoctorResponseDTO {
     private String hospitalAffiliation;
 
 
-    private List<MedicalRecordResponse> medicalRecords;
+    private List<MedicalRecordResponseDTO> medicalRecords;
 }

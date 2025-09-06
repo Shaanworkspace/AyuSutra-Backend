@@ -7,6 +7,7 @@ import java.util.List;
 
 @Repository
 public interface TherapistRepository extends JpaRepository<Therapist, Long> {
-    // Find therapist by expertise
     List<Therapist> findByExpertise(String expertise);
+
+    Therapist findByEmail(String email);
 }

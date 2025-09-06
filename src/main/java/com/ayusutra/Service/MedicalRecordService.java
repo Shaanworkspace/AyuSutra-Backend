@@ -1,16 +1,16 @@
 package com.ayusutra.Service;
 
-import com.ayusutra.DTO.MedicalRecordResponse;
+import com.ayusutra.DTO.Response.MedicalRecordResponseDTO;
 import com.ayusutra.Entity.Doctor;
 import com.ayusutra.Entity.MedicalRecord;
 import com.ayusutra.Entity.Patient;
 import com.ayusutra.Repository.DoctorRepository;
 import com.ayusutra.Repository.MedicalRecordRepository;
 import com.ayusutra.Repository.PatientRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -48,7 +48,7 @@ public class MedicalRecordService {
         return medicalRecordRepository.save(record);
     }
 
-    public List<MedicalRecordResponse> getAllMedicalRecords() {
+    public List<MedicalRecordResponseDTO> getAllMedicalRecords() {
         List<MedicalRecord> records = medicalRecordRepository.findAll();
         // Yeh sirf collect karega
         return records.stream()
@@ -57,8 +57,8 @@ public class MedicalRecordService {
     }
 
     // 🔹 Converter: Entity -> DTO
-    public MedicalRecordResponse medicalRecordToDto(MedicalRecord record) {
-        return new MedicalRecordResponse(
+    public MedicalRecordResponseDTO medicalRecordToDto(MedicalRecord record) {
+        return new MedicalRecordResponseDTO(
                 record.getId(),
                 record.getVisitDate(),
                 record.getSymptoms(),
@@ -114,19 +114,35 @@ public class MedicalRecordService {
     /**
      *  Update medical record (doctor adds diagnosis, treatment etc.)
      */
-    public MedicalRecord updateMedicalRecord(Long recordId, MedicalRecord updated) {
-        MedicalRecord existing = getMedicalRecordById(recordId);
+    @Transactional
+    public MedicalRecord updateMedicalRecord(Long id, MedicalRecord updatedRecord) {
+        MedicalRecord existing = medicalRecordRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("MedicalRecord not found with id: " + id));
 
-        existing.setDiagnosis(updated.getDiagnosis());
-        existing.setPrescribedTreatment(updated.getPrescribedTreatment());
-        existing.setMedications(updated.getMedications());
-        existing.setAllergies(updated.getAllergies());
-        existing.setMedicalHistoryNotes(updated.getMedicalHistoryNotes());
-        existing.setFollowUpRequired(updated.getFollowUpRequired());
-        existing.setNeedTherapy(updated.isNeedTherapy());
-        existing.setTherapist(updated.getTherapist());
-        existing.setApprovedByTherapist(updated.isApprovedByTherapist());
-        existing.setTherapyPlan(updated.getTherapyPlan());
+        // Only overwrite if value is not null
+        if (updatedRecord.getMedicalHistoryNotes() != null && !updatedRecord.getMedicalHistoryNotes().isEmpty())
+            existing.setMedicalHistoryNotes(updatedRecord.getMedicalHistoryNotes());
+
+        if (updatedRecord.getMedications() != null && !updatedRecord.getMedications().isEmpty())
+            existing.setMedications(updatedRecord.getMedications());
+
+        if (updatedRecord.getFollowUpRequired() != null && !updatedRecord.getFollowUpRequired().isEmpty())
+            existing.setFollowUpRequired(updatedRecord.getFollowUpRequired());
+
+        // booleans default = false, so handle carefully:
+        existing.setNeedTherapy(updatedRecord.isNeedTherapy());
+
+        if (updatedRecord.getRequiredTherapy() != null && !updatedRecord.getRequiredTherapy().isEmpty())
+            existing.setRequiredTherapy(updatedRecord.getRequiredTherapy());
+
+        if (updatedRecord.getTherapyPlan() != null)
+            existing.setTherapyPlan(updatedRecord.getTherapyPlan());
+
+        if (updatedRecord.getStatus() != null && !updatedRecord.getStatus().isEmpty())
+            existing.setStatus(updatedRecord.getStatus());
+
+        if (updatedRecord.getNoOfDays() != null)
+            existing.setNoOfDays(updatedRecord.getNoOfDays());
 
         return medicalRecordRepository.save(existing);
     }

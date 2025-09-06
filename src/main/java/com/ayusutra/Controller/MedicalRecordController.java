@@ -1,6 +1,6 @@
 package com.ayusutra.Controller;
 
-import com.ayusutra.DTO.MedicalRecordResponse;
+import com.ayusutra.DTO.Response.MedicalRecordResponseDTO;
 import com.ayusutra.Entity.MedicalRecord;
 import com.ayusutra.Service.MedicalRecordService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class MedicalRecordController {
      * Get all records
      */
     @GetMapping
-    public ResponseEntity<List<MedicalRecordResponse>> getAllRecords() {
+    public ResponseEntity<List<MedicalRecordResponseDTO>> getAllRecords() {
         return ResponseEntity.ok(medicalRecordService.getAllMedicalRecords());
     }
 
@@ -70,14 +70,13 @@ public class MedicalRecordController {
     /**
      * Update a medical record (doctor adds diagnosis, treatment, etc.)
      */
-    @PutMapping("/{recordId}")
-    public ResponseEntity<?> updateRecord(@PathVariable Long recordId,
-                                          @RequestBody MedicalRecord updated) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateMedicalRecord(@PathVariable Long id, @RequestBody MedicalRecord updatedData) {
         try {
-            MedicalRecord saved = medicalRecordService.updateMedicalRecord(recordId, updated);
-            return ResponseEntity.ok(saved);
+            MedicalRecord updated = medicalRecordService.updateMedicalRecord(id, updatedData);
+            return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ " + e.getMessage());
+            return ResponseEntity.status(404).body("❌ " + e.getMessage());
         }
     }
 
@@ -88,7 +87,7 @@ public class MedicalRecordController {
     public ResponseEntity<String> deleteRecord(@PathVariable Long recordId) {
         try {
             medicalRecordService.deleteMedicalRecord(recordId);
-            return ResponseEntity.ok("✅ Medical record deleted with ID: " + recordId);
+            return ResponseEntity.ok("Medical record deleted with ID: " + recordId);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ " + e.getMessage());
         }

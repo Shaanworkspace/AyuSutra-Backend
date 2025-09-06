@@ -1,4 +1,4 @@
-package com.ayusutra.DTO;
+package com.ayusutra.DTO.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,5 +27,5 @@ public class PatientResponseDTO {
     private LocalDateTime updatedAt;
 
 
-    private List<MedicalRecordResponse> medicalRecords;
+    private List<MedicalRecordResponseDTO> medicalRecords;
 }

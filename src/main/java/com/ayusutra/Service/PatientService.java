@@ -1,16 +1,13 @@
 package com.ayusutra.Service;
 
-import com.ayusutra.DTO.MedicalRecordResponse;
-import com.ayusutra.DTO.PatientResponseDTO;
+import com.ayusutra.DTO.Response.MedicalRecordResponseDTO;
+import com.ayusutra.DTO.Response.PatientResponseDTO;
 import com.ayusutra.Entity.Patient;
 import com.ayusutra.Repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +17,15 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final MedicalRecordService medicalRecordService;
 
+    public Patient login(String email, String password) {
+        Patient patient = patientRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("❌ Patient not found with email: " + email));
+
+        if (!patient.getPassword().equals(password)) {
+            throw new IllegalArgumentException("❌ Invalid password");
+        }
+        return patient;
+    }
 
     public Patient registerPatient(Patient patient) {
         // Check if email already exists
@@ -34,7 +40,7 @@ public class PatientService {
 
     public PatientResponseDTO patientToDto(Patient patient) {
         // Convert records into DTOs
-        List<MedicalRecordResponse> recordResponses = patient.getMedicalRecords() != null
+        List<MedicalRecordResponseDTO> recordResponses = patient.getMedicalRecords() != null
                 ? patient.getMedicalRecords().stream()
                 .map(medicalRecordService::medicalRecordToDto) // reuse existing record mapper
                 .collect(Collectors.toList())
