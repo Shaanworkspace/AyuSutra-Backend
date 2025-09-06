@@ -18,9 +18,6 @@ public class PatientService {
 
     // ✅ Register new patient
     public Patient registerPatient(Patient patient) {
-        patient.setCreatedAt(LocalDateTime.now());
-        patient.setUpdatedAt(LocalDateTime.now());
-        // NOTE: in production, hash password before saving
         return patientRepository.save(patient);
     }
 

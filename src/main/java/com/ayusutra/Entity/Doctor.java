@@ -9,11 +9,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "doctor")
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Data
 public class Doctor {
 
     @Id
@@ -52,14 +51,4 @@ public class Doctor {
     )
     private List<TherapyPlan> therapyPlans = new ArrayList<>();
 
-    // Convenience method for bi-directional mapping
-    public void addTherapyPlan(TherapyPlan plan) {
-        therapyPlans.add(plan);
-        plan.setDoctor(this);
-    }
-
-    public void removeTherapyPlan(TherapyPlan plan) {
-        therapyPlans.remove(plan);
-        plan.setDoctor(null);
-    }
 }

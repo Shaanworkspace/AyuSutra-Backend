@@ -9,11 +9,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "patients")
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Data
 public class Patient {
 
     @Id
