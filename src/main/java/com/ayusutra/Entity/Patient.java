@@ -1,5 +1,8 @@
 package com.ayusutra.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -7,6 +10,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 @Entity
 @Table(name = "patients")
 @NoArgsConstructor
@@ -57,6 +64,7 @@ public class Patient {
     private LocalDateTime updatedAt;
 
     // Relationships
+    @Builder.Default
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MedicalRecord> medicalRecords = new ArrayList<>();
 

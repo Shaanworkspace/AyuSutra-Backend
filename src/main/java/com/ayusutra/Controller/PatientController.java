@@ -1,12 +1,12 @@
 package com.ayusutra.Controller;
 
 
+import com.ayusutra.DTO.PatientResponseDTO;
 import com.ayusutra.Entity.MedicalRecord;
 import com.ayusutra.Entity.Patient;
+import com.ayusutra.Service.MedicalRecordService;
 import com.ayusutra.Service.PatientService;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PatientController {
     private final PatientService patientService;
+    private final MedicalRecordService medicalRecordService;
 
     @PostMapping
     public ResponseEntity<?> createPatient(@RequestBody Patient patient) {
@@ -30,23 +31,18 @@ public class PatientController {
         }
     }
 
-    @PostMapping("/bulk")
-    public List<Patient> createPatients(@RequestBody List<Patient> patients) {
-        return patients.stream().map(patientService::registerPatient).toList();
-    }
 
     // ✅ Get all patients
     @GetMapping
-    public List<Patient> getAllPatients() {
-        return patientService.getAllPatients();
+    public ResponseEntity<List<PatientResponseDTO>> getAllPatients() {
+        return ResponseEntity.ok(patientService.getAllPatients());
     }
 
     // ✅ Get patient by ID
     @GetMapping("/{id}")
-    public Patient getPatientById(@PathVariable Long id) {
-        return patientService.getPatientById(id);
+    public ResponseEntity<PatientResponseDTO> getPatientById(@PathVariable Long id) {
+        return ResponseEntity.ok(patientService.getPatientById(id));
     }
-
 
 
     // ✅ Delete patient
@@ -79,20 +75,15 @@ public class PatientController {
         return patientService.getPatientsByBloodGroup(bloodGroup);
     }
 
-    @PostMapping("medical-record/{patientId}")
-    public ResponseEntity<String> createMedicalRecord(@RequestBody MedicalRecord medicalRecord,
-                                                      @PathVariable Long patientId) {
-        Patient patient = patientService.getPatientById(patientId);
-        if (patient == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("❌ Patient not found with ID: " + patientId);
+    @PostMapping("/doctor-visit/{patientId}")
+    public ResponseEntity<?> createMedicalRecord(@RequestBody MedicalRecord medicalRecord,
+                                                 @PathVariable Long patientId) {
+        try {
+            medicalRecordService.createMedicalRecord(patientId, medicalRecord);
+            PatientResponseDTO patientDto = patientService.getPatientById(patientId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(patientDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ " + e.getMessage());
         }
-
-        medicalRecord.setPatient(patient);
-        patient.getMedicalRecords().add(medicalRecord);
-        patientService.registerPatient(patient);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("✅ Medical record added successfully for Patient ID: " + patientId);
     }
 }

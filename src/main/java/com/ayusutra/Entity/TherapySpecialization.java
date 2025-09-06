@@ -22,6 +22,7 @@ public class TherapySpecialization {
 
     private String description; // Optional: details about therapy
 
+    @Builder.Default
     @ManyToMany(mappedBy = "specializations")
     private List<Therapist> therapists = new ArrayList<>();
 }

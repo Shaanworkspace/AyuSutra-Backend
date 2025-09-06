@@ -1,12 +1,23 @@
 package com.ayusutra.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 @Entity
 @Table(name = "medical_records")
 @NoArgsConstructor
@@ -20,11 +31,11 @@ public class MedicalRecord {
     private Long id;
 
     // Links
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
@@ -55,6 +66,7 @@ public class MedicalRecord {
     private boolean needTherapy;
 
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "patient_need_therapy",
@@ -64,10 +76,11 @@ public class MedicalRecord {
     private List<TherapySpecialization> requiredTherapy = new ArrayList<>();
 
     @OneToOne
+    @JoinColumn(nullable = true)
     private TherapyPlan therapyPlan;
 
-    @ManyToOne
-    @JoinColumn(name = "therapist_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "therapist_id", nullable = true)
     private Therapist therapist;
 
 

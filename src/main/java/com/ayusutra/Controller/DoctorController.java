@@ -1,8 +1,11 @@
 package com.ayusutra.Controller;
 
+import com.ayusutra.DTO.DoctorResponseDTO;
 import com.ayusutra.Entity.Doctor;
 import com.ayusutra.Service.DoctorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,18 +18,19 @@ public class DoctorController {
     private DoctorService doctorService;
 
     @PostMapping
-    public Doctor createDoctor(@RequestBody Doctor doctor) {
-        return doctorService.createDoctor(doctor);
-    }
-
-    @PostMapping("/bulk")
-    public List<Doctor> createDoctors(@RequestBody List<Doctor> doctors) {
-        return doctorService.createDoctors(doctors);
+    public ResponseEntity<?> createDoctor(@RequestBody Doctor doctor) {
+        try {
+            Doctor doctor1 = doctorService.createDoctor(doctor);
+            return ResponseEntity.status(HttpStatus.CREATED).body(doctor1);
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
     @GetMapping
-    public List<Doctor> getAllDoctors() {
-        return doctorService.getAllDoctors();
+    public ResponseEntity<List<DoctorResponseDTO>> getAllDoctors() {
+        return ResponseEntity.ok(doctorService.getAllDoctors());
     }
 
     @GetMapping("/{id}")

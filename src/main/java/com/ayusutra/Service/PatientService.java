@@ -1,5 +1,7 @@
 package com.ayusutra.Service;
 
+import com.ayusutra.DTO.MedicalRecordResponse;
+import com.ayusutra.DTO.PatientResponseDTO;
 import com.ayusutra.Entity.Patient;
 import com.ayusutra.Repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,12 +11,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final MedicalRecordService medicalRecordService;
 
 
     public Patient registerPatient(Patient patient) {
@@ -27,14 +31,46 @@ public class PatientService {
         return patientRepository.save(patient);
     }
 
-    // ✅ Get patient by ID
-    public Patient getPatientById(Long id) {
-        return patientRepository.findById(id).orElse(null);
+
+    public PatientResponseDTO patientToDto(Patient patient) {
+        // Convert records into DTOs
+        List<MedicalRecordResponse> recordResponses = patient.getMedicalRecords() != null
+                ? patient.getMedicalRecords().stream()
+                .map(medicalRecordService::medicalRecordToDto) // reuse existing record mapper
+                .collect(Collectors.toList())
+                : List.of();
+
+        return new PatientResponseDTO(
+                patient.getId(),
+                patient.getFirstName(),
+                patient.getLastName(),
+                patient.getAge(),
+                patient.getGender(),
+                patient.getDateOfBirth(),
+                patient.getBloodGroup(),
+                patient.getEmail(),
+                patient.getPhoneNumber(),
+                patient.getAddress(),
+                patient.getEmergencyContact(),
+                patient.getCreatedAt(),
+                patient.getUpdatedAt(),
+                recordResponses
+        );
     }
 
-    // ✅ Get all patients
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
+    // Get patient by ID
+    public PatientResponseDTO getPatientById(Long id) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Patient not found with id: " + id));
+
+        return patientToDto(patient);
+    }
+
+    //  Get all patients with mapped DTOs
+    public List<PatientResponseDTO> getAllPatients() {
+        return patientRepository.findAll().stream()
+                .map(this::patientToDto) // reuse the converter here as well
+                .collect(Collectors.toList());
     }
 
 
