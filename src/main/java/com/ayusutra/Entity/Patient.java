@@ -23,6 +23,8 @@ public class Patient {
     @Column(nullable = false, length = 50)
     private String firstName;
 
+    private Integer age=5;
+
     @Column(nullable = false, length = 50)
     private String lastName;
 

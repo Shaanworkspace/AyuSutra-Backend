@@ -16,8 +16,14 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
 
-    // ✅ Register new patient
+
     public Patient registerPatient(Patient patient) {
+        // Check if email already exists
+        if (patientRepository.findByEmail(patient.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Patient with this email already exists");
+        }
+
+        // Let timestamps be handled by entity @PrePersist
         return patientRepository.save(patient);
     }
 

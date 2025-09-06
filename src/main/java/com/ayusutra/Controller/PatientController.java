@@ -19,13 +19,17 @@ import java.util.List;
 public class PatientController {
     private final PatientService patientService;
 
-    // ✅ Register single patient
     @PostMapping
-    public Patient createPatient(@RequestBody Patient patient) {
-        return patientService.registerPatient(patient);
+    public ResponseEntity<?> createPatient(@RequestBody Patient patient) {
+        try {
+            Patient savedPatient = patientService.registerPatient(patient);
+            // Return 201 Created
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedPatient);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
-    // ✅ Bulk create patients
     @PostMapping("/bulk")
     public List<Patient> createPatients(@RequestBody List<Patient> patients) {
         return patients.stream().map(patientService::registerPatient).toList();
