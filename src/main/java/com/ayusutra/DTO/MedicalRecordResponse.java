@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,7 +18,7 @@ public class MedicalRecordResponse {
     private String diagnosis;
     private String prescribedTreatment;
 
-    // only essentials for doctor & patient
+    // Essentials for doctor & patient
     private Long patientId;
     private String patientName;
 
@@ -26,4 +27,14 @@ public class MedicalRecordResponse {
 
     private Long therapistId;
     private String therapistName;
+
+    // 👇 New Fields from Entity
+    private LocalDate createdDate;
+    private String therapyName;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String status;
+    private Integer noOfDays;
+    private String doctorNotes;
+    private Double rating;
 }

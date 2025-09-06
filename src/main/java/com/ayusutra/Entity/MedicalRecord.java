@@ -1,6 +1,5 @@
 package com.ayusutra.Entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
@@ -9,10 +8,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
@@ -40,7 +39,7 @@ public class MedicalRecord {
     private Doctor doctor;
 
     // Visit Details
-    private LocalDateTime visitDate;
+    private LocalDateTime visitDate;   // kab doctor ko dikhaaya
 
     @Column(length = 255)
     private String symptoms;
@@ -62,9 +61,7 @@ public class MedicalRecord {
 
     private String followUpRequired;
 
-
     private boolean needTherapy;
-
 
     @Builder.Default
     @ManyToMany
@@ -83,6 +80,32 @@ public class MedicalRecord {
     @JoinColumn(name = "therapist_id", nullable = true)
     private Therapist therapist;
 
-
     private boolean approvedByTherapist;
+
+    // Record creation date (auto set)
+    private LocalDate createdDate;
+
+    // Therapy name (like Panchakarma 5 types)
+    @Column(length = 100)
+    private String therapyName;   // e.g. "Vamana", "Virechana", "Basti", "Nasya", "Raktamokshana"
+
+    private LocalDate startDate;   // therapy start
+    private LocalDate endDate;     // therapy end
+
+    private String status;         // Active, Completed, Pending
+    private Integer noOfDays;      // duration
+
+    @Lob
+    private String doctorNotes;    // Doctor instructions
+
+    private Double rating;         // Patient feedback rating (0–5)
+
+    //Automatically set createdDate & visitDate when record is first created
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = LocalDate.now();
+        if (this.visitDate == null) {
+            this.visitDate = LocalDateTime.now();
+        }
+    }
 }

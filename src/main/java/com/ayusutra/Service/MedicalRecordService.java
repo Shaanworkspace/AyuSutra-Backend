@@ -75,7 +75,17 @@ public class MedicalRecordService {
                 record.getTherapist() != null ? record.getTherapist().getId() : null,
                 record.getTherapist() != null
                         ? record.getTherapist().getFirstName() + " " + record.getTherapist().getLastName()
-                        : null
+                        : null,
+
+                // 👇 Mapping new fields
+                record.getCreatedDate(),
+                record.getTherapyName(),
+                record.getStartDate(),
+                record.getEndDate(),
+                record.getStatus(),
+                record.getNoOfDays(),
+                record.getDoctorNotes(),
+                record.getRating()
         );
     }
 
