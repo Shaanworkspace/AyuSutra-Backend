@@ -3,12 +3,16 @@ package com.ayusutra.Controller;
 
 import com.ayusutra.DTO.Request.LoginRequestDTO;
 import com.ayusutra.DTO.Response.TherapistResponseDTO;
+import com.ayusutra.DTO.Response.WeeklyScheduleDTO;
 import com.ayusutra.Entity.Therapist;
+import com.ayusutra.Service.ScheduleService;
 import com.ayusutra.Service.TherapistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -17,17 +21,36 @@ import java.util.List;
 public class TherapistController {
 
     private final TherapistService therapistService;
+    private final ScheduleService scheduleService;
 
     @PostMapping
-    public Therapist createTherapist(@RequestBody Therapist therapist) {
-        return therapistService.addTherapist(therapist);
+    public ResponseEntity<TherapistResponseDTO> createTherapist(@RequestBody Therapist therapist) {
+        Therapist saved = therapistService.addTherapist(therapist);
+        return ResponseEntity.ok(therapistService.therapistToDTO(saved));
     }
 
     @PostMapping("/bulk")
     public List<Therapist> createTherapists(@RequestBody List<Therapist> therapists) {
         return therapistService.createTherapists(therapists);
     }
+    @PostMapping("/{therapistId}/schedule-week")
+    public ResponseEntity<List<WeeklyScheduleDTO>> generateWeekSchedule(
+            @PathVariable Long therapistId,
+            @RequestParam String startDate, // Monday date (ISO-8601)
+            @RequestBody List<TimeRangeRequest> slotTimes) {
 
+        LocalDate start = LocalDate.parse(startDate);
+
+        // Convert request to a list of time ranges
+        List<LocalTime[]> ranges = slotTimes.stream()
+                .map(t -> new LocalTime[]{LocalTime.parse(t.getStartTime()), LocalTime.parse(t.getEndTime())})
+                .toList();
+
+        List<WeeklyScheduleDTO> weeklySchedule =
+                scheduleService.generateWeeklySchedule(therapistId, start, ranges);
+
+        return ResponseEntity.ok(weeklySchedule);
+    }
     @GetMapping
     public List<TherapistResponseDTO> getAllTherapists() {
         return therapistService.getAllTherapists();

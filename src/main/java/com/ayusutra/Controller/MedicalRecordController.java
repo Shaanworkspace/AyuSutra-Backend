@@ -30,6 +30,16 @@ public class MedicalRecordController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("❌ " + e.getMessage());
         }
     }
+    @PutMapping("/{recordId}/assign-therapist/{therapistId}")
+    public ResponseEntity<?> assignTherapistToRecord(@PathVariable Long recordId,
+                                                     @PathVariable Long therapistId) {
+        try {
+            MedicalRecord updated = medicalRecordService.assignTherapist(recordId, therapistId);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ " + e.getMessage());
+        }
+    }
 
     /**
      * Get all records

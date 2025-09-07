@@ -21,56 +21,47 @@ public class PatientController {
     private final PatientService patientService;
     private final MedicalRecordService medicalRecordService;
 
-    @PostMapping
-    public ResponseEntity<?> createPatient(@RequestBody Patient patient) {
-        try {
-            Patient savedPatient = patientService.registerPatient(patient);
-            // Return 201 Created
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedPatient);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
-    }
 
 
-    // ✅ Get all patients
+
+    //  Get all patients
     @GetMapping
     public ResponseEntity<List<PatientResponseDTO>> getAllPatients() {
         return ResponseEntity.ok(patientService.getAllPatients());
     }
 
-    // ✅ Get patient by ID
+    //  Get patient by ID
     @GetMapping("/{id}")
     public ResponseEntity<PatientResponseDTO> getPatientById(@PathVariable Long id) {
         return ResponseEntity.ok(patientService.getPatientById(id));
     }
 
 
-    // ✅ Delete patient
+    //  Delete patient
     @DeleteMapping("/{id}")
     public void deletePatient(@PathVariable Long id) {
         patientService.deletePatient(id);
     }
 
-    // ✅ Get patient by email
+    //  Get patient by email
     @GetMapping("/email/{email}")
     public Patient getPatientByEmail(@PathVariable String email) {
         return patientService.getPatientByEmail(email);
     }
 
-    // ✅ Get patient by phone
+    //  Get patient by phone
     @GetMapping("/phone/{phone}")
     public Patient getPatientByPhone(@PathVariable String phone) {
         return patientService.getPatientByPhone(phone);
     }
 
-    // ✅ Search patients by name (first or last)
+    //  Search patients by name (first or last)
     @GetMapping("/search")
     public List<Patient> searchPatientsByName(@RequestParam String name) {
         return patientService.searchPatientsByName(name);
     }
 
-    // ✅ Get patients by blood group
+    //  Get patients by blood group
     @GetMapping("/blood-group/{bloodGroup}")
     public List<Patient> getPatientsByBloodGroup(@PathVariable String bloodGroup) {
         return patientService.getPatientsByBloodGroup(bloodGroup);
@@ -87,7 +78,16 @@ public class PatientController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ " + e.getMessage());
         }
     }
-
+    @PostMapping
+    public ResponseEntity<?> createPatient(@RequestBody Patient patient) {
+        try {
+            Patient savedPatient = patientService.registerPatient(patient);
+            // Return 201 Created
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedPatient);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+    }
 
 
     @PostMapping("/login")

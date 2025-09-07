@@ -3,6 +3,7 @@ package com.ayusutra.Entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,8 @@ public class Therapist {
 
     @Lob
     private String bio;             // full description of therapist
+
+
     @OneToMany(mappedBy = "therapist", cascade = CascadeType.ALL)
     private List<TherapyPlan> therapyPlans = new ArrayList<>();
 
@@ -60,4 +63,10 @@ public class Therapist {
 
     @OneToMany
     private List<MedicalRecord> medicalRecords;
+
+    private LocalDate registrationDate;
+    @PrePersist
+    protected void onRegister() {
+        this.registrationDate = LocalDate.now();
+    }
 }

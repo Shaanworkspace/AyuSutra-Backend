@@ -19,6 +19,6 @@ public class ScheduleSlotDTO {
     private LocalTime endTime;
     private SlotStatus status;
 
-    private Long bookedByPatientId;
-    private String bookedByPatientName;
+    private Long bookedById;
+    private String bookedByName;
 }

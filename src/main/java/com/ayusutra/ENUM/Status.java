@@ -2,10 +2,12 @@ package com.ayusutra.ENUM;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public enum SlotStatus {
-    AVAILABLE,
-    BOOKED,
-    CANCELLED;
+public enum Status {
+    ACTIVE,
+    COMPLETED,
+    PENDING,
+    HAVING_TREATMENT,
+    HAVING_THERAPY;
 
     @JsonCreator
     public static Status fromValue(String value) {

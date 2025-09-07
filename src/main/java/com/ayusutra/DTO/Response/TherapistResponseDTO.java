@@ -1,5 +1,6 @@
 package com.ayusutra.DTO.Response;
 
+import com.ayusutra.DTO.TherapySpecializationDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,7 @@ public class TherapistResponseDTO {
     private String clinicLocation;
     private String bio;
 
-    // 👇 All details
+
     private List<TherapyPlanDTO> therapyPlans;
     private List<ScheduleSlotDTO> scheduleSlots;
     private List<TherapySpecializationDTO> specializations;

@@ -39,5 +39,4 @@ public class ScheduleSlot {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id")
     private Patient bookedBy;  // only set if status=BOOKED
-
 }

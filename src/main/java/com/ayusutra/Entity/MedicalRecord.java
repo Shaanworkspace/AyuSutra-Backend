@@ -1,5 +1,6 @@
 package com.ayusutra.Entity;
 
+import com.ayusutra.ENUM.Status;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
@@ -54,14 +55,14 @@ public class MedicalRecord {
     private String allergies;
 
     @Lob
-    private String medicalHistoryNotes;
+    private String medicalHistoryNotes; //updated By doctor
 
     @Lob
-    private String medications;
+    private String medications; //updated By doctor
 
-    private String followUpRequired;
+    private String followUpRequired; //updated By doctor
 
-    private boolean needTherapy;
+    private boolean needTherapy; //updated By doctor
 
     @Builder.Default
     @ManyToMany
@@ -70,15 +71,15 @@ public class MedicalRecord {
             joinColumns = @JoinColumn(name = "medical_record_id"),
             inverseJoinColumns = @JoinColumn(name = "specialization_id")
     )
-    private List<TherapySpecialization> requiredTherapy = new ArrayList<>();
+    private List<TherapySpecialization> requiredTherapy = new ArrayList<>(); //updated By doctor
 
     @OneToOne
     @JoinColumn(nullable = true)
-    private TherapyPlan therapyPlan;
+    private TherapyPlan therapyPlan; //updated By doctor
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "therapist_id", nullable = true)
-    private Therapist therapist;
+    private Therapist therapist;  //Patient krega update
 
     private boolean approvedByTherapist;
 
@@ -92,11 +93,11 @@ public class MedicalRecord {
     private LocalDate startDate;   // therapy start
     private LocalDate endDate;     // therapy end
 
-    private String status;         // Active, Completed, Pending
+    private Status status;        // Active, Completed, Pending
     private Integer noOfDays;      // duration
 
     @Lob
-    private String doctorNotes;    // Doctor instructions
+    private String doctorNotes;     //updated By doctor
 
     private Double rating;         // Patient feedback rating (0–5)
 

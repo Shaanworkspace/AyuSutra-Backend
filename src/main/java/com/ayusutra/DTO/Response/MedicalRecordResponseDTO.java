@@ -28,7 +28,6 @@ public class MedicalRecordResponseDTO {
     private Long therapistId;
     private String therapistName;
 
-    // 👇 New Fields from Entity
     private LocalDate createdDate;
     private String therapyName;
     private LocalDate startDate;
