@@ -50,6 +50,31 @@ public class MedicalRecordService {
         logger.info("Set the patient and doctor");
         return medicalRecordRepository.save(record);
     }
+    @Transactional
+    public MedicalRecord updateTherapies(Long recordId, boolean needTherapy, List<Long> therapyIds) {
+        MedicalRecord record = medicalRecordRepository.findById(recordId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("❌ Medical Record not found with id " + recordId));
+
+        record.setNeedTherapy(needTherapy);
+
+        if (therapyIds != null) {
+            List<com.ayusutra.Entity.TherapySpecialization> therapies =
+                    therapyIds.isEmpty()
+                            ? new java.util.ArrayList<>()
+                            : therapyIds.stream()
+                            .map(id -> {
+                                com.ayusutra.Entity.TherapySpecialization th = new com.ayusutra.Entity.TherapySpecialization();
+                                th.setId(id);
+                                return th;
+                            })
+                            .collect(Collectors.toList()); // ✅ modifiable
+
+            record.setRequiredTherapy(therapies);
+        }
+
+        return medicalRecordRepository.save(record);
+    }
 
     public List<MedicalRecordResponseDTO> getAllMedicalRecords() {
         List<MedicalRecord> records = medicalRecordRepository.findAll();

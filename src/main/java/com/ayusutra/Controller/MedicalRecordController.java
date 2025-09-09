@@ -1,5 +1,6 @@
 package com.ayusutra.Controller;
 
+import com.ayusutra.DTO.Request.TherapyUpdateRequest;
 import com.ayusutra.DTO.Response.MedicalRecordResponseDTO;
 import com.ayusutra.Entity.MedicalRecord;
 import com.ayusutra.Service.MedicalRecordService;
@@ -67,6 +68,22 @@ public class MedicalRecordController {
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<List<MedicalRecord>> getRecordsByPatient(@PathVariable Long patientId) {
         return ResponseEntity.ok(medicalRecordService.getMedicalRecordsByPatient(patientId));
+    }
+
+    @PutMapping("/{recordId}/therapies")
+    public ResponseEntity<?> updateTherapies(
+            @PathVariable Long recordId,
+            @RequestBody TherapyUpdateRequest req) {
+        try {
+            MedicalRecord updated = medicalRecordService.updateTherapies(
+                    recordId,
+                    req.isNeedTherapy(),
+                    req.getTherapyIds()
+            );
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ " + e.getMessage());
+        }
     }
 
     /**
