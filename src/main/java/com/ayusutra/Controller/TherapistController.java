@@ -2,8 +2,10 @@ package com.ayusutra.Controller;
 
 
 import com.ayusutra.DTO.Request.LoginRequestDTO;
+import com.ayusutra.DTO.Response.ScheduleSlotDTO;
 import com.ayusutra.DTO.Response.TherapistResponseDTO;
 import com.ayusutra.DTO.Response.WeeklyScheduleDTO;
+import com.ayusutra.Entity.ScheduleSlot;
 import com.ayusutra.Entity.Therapist;
 import com.ayusutra.Service.ScheduleService;
 import com.ayusutra.Service.TherapistService;
@@ -33,6 +35,34 @@ public class TherapistController {
     public List<Therapist> createTherapists(@RequestBody List<Therapist> therapists) {
         return therapistService.createTherapists(therapists);
     }
+    @PutMapping("/{therapistId}/book-slot/{slotId}")
+    public ResponseEntity<?> bookSlot(
+            @PathVariable Long therapistId,
+            @PathVariable Long slotId,
+            @RequestParam Long patientId
+    ) {
+        try {
+            ScheduleSlot booked = scheduleService.bookSlot(therapistId, slotId, patientId);
+
+            ScheduleSlotDTO dto = new ScheduleSlotDTO(
+                    booked.getId(),
+                    booked.getDate(),
+                    booked.getStartTime(),
+                    booked.getEndTime(),
+                    booked.getStatus(),
+                    booked.getBookedBy() != null ? booked.getBookedBy().getId() : null,
+                    booked.getBookedBy() != null
+                            ? booked.getBookedBy().getFirstName() + " " + booked.getBookedBy().getLastName()
+                            : null
+            );
+
+            return ResponseEntity.ok(dto);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("❌ " + e.getMessage());
+        }
+    }
+
     @PostMapping("/{therapistId}/schedule-week")
     public ResponseEntity<List<WeeklyScheduleDTO>> generateWeekSchedule(
             @PathVariable Long therapistId,

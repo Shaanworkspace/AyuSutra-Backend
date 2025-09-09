@@ -3,10 +3,13 @@ package com.ayusutra.Service;
 import com.ayusutra.DTO.Response.ScheduleSlotDTO;
 import com.ayusutra.DTO.Response.WeeklyScheduleDTO;
 import com.ayusutra.ENUM.SlotStatus;
+import com.ayusutra.Entity.Patient;
 import com.ayusutra.Entity.ScheduleSlot;
 import com.ayusutra.Entity.Therapist;
+import com.ayusutra.Repository.PatientRepository;
 import com.ayusutra.Repository.ScheduleSlotRepository;
 import com.ayusutra.Repository.TherapistRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +23,7 @@ import java.util.List;
 public class ScheduleService {
     private final ScheduleSlotRepository slotRepository;
     private final TherapistRepository therapistRepository;
-
+    private final PatientRepository patientRepository;
     public List<WeeklyScheduleDTO> generateWeeklySchedule(Long therapistId,
                                                           LocalDate startOfWeek,
                                                           List<LocalTime[]> slotTimes) {
@@ -60,5 +63,30 @@ public class ScheduleService {
             ));
         }
         return weeklySchedule;
+    }
+    @Transactional
+    public ScheduleSlot bookSlot(Long therapistId, Long slotId, Long patientId) {
+        Therapist therapist = therapistRepository.findById(therapistId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ Therapist not found with id " + therapistId));
+
+        ScheduleSlot slot = slotRepository.findById(slotId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ Slot not found with id " + slotId));
+
+        if (!slot.getTherapist().getId().equals(therapistId)) {
+            throw new IllegalArgumentException("❌ Slot does not belong to this therapist");
+        }
+
+        if (slot.getStatus() != SlotStatus.AVAILABLE) {
+            throw new IllegalArgumentException("❌ Slot already booked or unavailable");
+        }
+
+        // ✅ Attach patient properly via PatientRepository
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new IllegalArgumentException("❌ Patient not found with id " + patientId));
+
+        slot.setBookedBy(patient);
+        slot.setStatus(SlotStatus.BOOKED);
+
+        return slotRepository.save(slot);
     }
 }
